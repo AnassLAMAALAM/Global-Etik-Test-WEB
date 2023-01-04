@@ -15,6 +15,7 @@
         <mat-form-field>
             <mat-label>Email</mat-label>
             <input placeholder="Email" matInput formControlName="email">
+            <mat-error *ngIf="form.get('email')?.hasError('pattern')"> Invalid email </mat-error>
         </mat-form-field>
 
         <mat-form-field>
@@ -38,7 +39,9 @@
 
     </div>
     <div mat-dialog-actions>
-        <button mat-raised-button color="warn" mat-dialog-close>Close</button>
-        <button type="submit" mat-raised-button color="primary" cdkFocusInitial>Save</button>
+        <div class="push-right">
+            <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+            <button type="submit" mat-raised-button color="primary" cdkFocusInitial>Save</button>
+        </div>
     </div>
 </form>

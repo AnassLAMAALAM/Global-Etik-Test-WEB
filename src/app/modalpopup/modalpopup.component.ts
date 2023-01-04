@@ -6,6 +6,8 @@ import { AppSettings } from '../Service/master.service';
 import { ApiAction } from '../shared/Enums/api-action.enum';
 import { ApiUrl } from '../shared/Enums/api-url.enum';
 import { StatusEnum } from '../shared/Enums/status.enum';
+import Swal from 'sweetalert2'
+
 
 @Component({
   selector: 'app-modalpopup',
@@ -48,7 +50,8 @@ export class ModalpopupComponent implements OnInit {
 
   form = new FormGroup({
     name: new FormControl("", Validators.required),
-    email: new FormControl("", Validators.required),
+    email: new FormControl("", [Validators.required, Validators.required, 
+      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]),
     birthday: new FormControl("", Validators.required),
     password: new FormControl("", Validators.required),
     status: new FormControl(StatusEnum.Enabled),
@@ -56,16 +59,18 @@ export class ModalpopupComponent implements OnInit {
 
   async submit() {
     if (this.form.valid) {
-      let result = null;
+      let resultCommand = null;
       if (this.isModif) {
+        alertify.set('notifier', 'position', 'top-right');
+
         let dataToUpate: any;
         dataToUpate = this.form.value;
         dataToUpate["id"] = this.data.id;
-        result = await this.updateUser(dataToUpate);
+        resultCommand = await this.updateUser(dataToUpate);
       } else {
-        result = await this.createUser();
+        resultCommand = await this.createUser();
       }
-      if (result) {
+      if (resultCommand) {
         if (this.isModif) {
           alertify.success("The user has already been updated successfully");
         } else {
@@ -93,6 +98,7 @@ export class ModalpopupComponent implements OnInit {
   }
 
 
+  // Update User
   updateUser(dataToUpate: any) {
     return new Promise((resolve, reject) => {
       this.service.update(`${ApiUrl.User}/${ApiAction.Update}`, dataToUpate).subscribe((res: any) => {
@@ -102,4 +108,7 @@ export class ModalpopupComponent implements OnInit {
       });
     });
   }
+
+  // Delete User
+
 }

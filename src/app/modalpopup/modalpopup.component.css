@@ -3,3 +3,7 @@
     position: relative;
     text-align: left;
 }
+
+.push-right {
+    float: right;
+}

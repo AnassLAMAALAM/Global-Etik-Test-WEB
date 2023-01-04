@@ -4,14 +4,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ModalpopupComponent } from './modalpopup/modalpopup.component';
-import * as alertify from 'alertifyjs'
 import { AppSettings } from './Service/master.service';
 import { ApiAction } from './shared/Enums/api-action.enum';
 import { StatusEnum } from './shared/Enums/status.enum';
 import { ApiUrl } from './shared/Enums/api-url.enum';
 import { User } from './Model/User';
-
-
+import { Title } from '@angular/platform-browser';
+import Swal from 'sweetalert2'
+import * as alertify from 'alertifyjs';
 
 
 @Component({
@@ -30,14 +30,13 @@ export class AppComponent implements OnInit {
   @ViewChild(MatPaginator) paginator !: MatPaginator;
   @ViewChild(MatSort) sort !: MatSort;
 
-  constructor(private service: AppSettings, private dialog: MatDialog) {
-
+  constructor(private service: AppSettings, private dialog: MatDialog, private titleService: Title) {
+    this.titleService.setTitle("Global Itik Test");
   }
+
   ngOnInit(): void {
     this.setData();
   }
-
-
 
   async setData() {
     this.users = await this.getUsers() as User[];
@@ -45,6 +44,7 @@ export class AppComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+
   getUsers() {
     return new Promise((resolve, reject) => {
       this.service.getAll(`${ApiUrl.User}/${ApiAction.GetAll}`).subscribe(res => {
@@ -65,13 +65,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // GetAll() {
-  //   this.service.getAll(ApiAction.GetAll).subscribe((result as any) => {
-  //     this.empdata = result;
-
-
-  //   });
-  // }
   Filterchange(event: Event) {
     const filvalue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filvalue;
@@ -83,18 +76,30 @@ export class AppComponent implements OnInit {
 
 
   delete(id: number) {
-    alertify.confirm("Remove Employee", "Do you want to remove?", async () => {
-      const result = await this.deleteUser(id);
-      if (result) {
+    debugger;
+    alertify.set('notifier', 'position', 'top-right');
+    Swal.fire({
+      title: 'Remove Employee',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Remove',
+      denyButtonText: `Don't Remove`,
+    }).then(async (result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        const isDeleted = await this.deleteUser(id);
+        if(isDeleted){
         this.users = await this.getUsers() as User[];
         this.dataSource = new MatTableDataSource<User>(this.users)
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
-        alertify.success("Removed successfully.")
-      } else {
-        alertify.warn("Erreur server.")
+        alertify.success("The user has been removed successfully");
+      } else if (result.isDenied) {
+        alertify.success("The user has been failed to remove");
       }
+    }
     })
+
   }
 
   OpenDialog(enteranimation: any, exitanimation: any, id: any) {
