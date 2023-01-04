@@ -1,0 +1,44 @@
+<h1 mat-dialog-title>
+    <ng-container *ngIf="isModif">
+        Edit User
+    </ng-container>
+    <ng-container *ngIf="!isModif">
+        Add User
+    </ng-container>
+</h1>
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div mat-dialog-content>
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input placeholder="Name" matInput formControlName="name">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input placeholder="Email" matInput formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Birthday</mat-label>
+            <input placeholder="Birthday" matInput formControlName="birthday" type="date">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Password</mat-label>
+            <input placeholder="Password" type="password" matInput formControlName="password">
+        </mat-form-field>
+
+        <mat-radio-group formControlName="status" aria-label="Select an Status">
+            <mat-radio-button [value]="statusEnum.Enabled">Enabled</mat-radio-button>
+            &nbsp;
+            <mat-radio-button [value]="statusEnum.Disabled">Disabled</mat-radio-button>
+        </mat-radio-group>
+        <section class="example-section">
+            <br>
+        </section>
+
+    </div>
+    <div mat-dialog-actions>
+        <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+        <button type="submit" mat-raised-button color="primary" cdkFocusInitial>Save</button>
+    </div>
+</form>
