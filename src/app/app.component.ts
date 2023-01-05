@@ -22,10 +22,12 @@ import * as alertify from 'alertifyjs';
 
 export class AppComponent implements OnInit {
 
+  //#region 
   statusEnum: typeof StatusEnum = StatusEnum;
   displayedColumns: string[] = ['name', 'email', 'birthday', 'status', 'action'];
   dataSource: any;
   users: User[] = [];
+  //#endregion
 
   @ViewChild(MatPaginator) paginator !: MatPaginator;
   @ViewChild(MatSort) sort !: MatSort;
@@ -38,6 +40,9 @@ export class AppComponent implements OnInit {
     this.setData();
   }
 
+  /**
+   * set data in datatable
+   */
   async setData() {
     this.users = await this.getUsers() as User[];
     this.dataSource = new MatTableDataSource<User>(this.users)
@@ -45,6 +50,10 @@ export class AppComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
+  /**
+   * get user list from api 
+   * @returns 
+   */
   getUsers() {
     return new Promise((resolve, reject) => {
       this.service.getAll(`${ApiUrl.User}/${ApiAction.GetAll}`).subscribe(res => {
@@ -55,6 +64,11 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /**
+   * delete user from data
+   * @param id 
+   * @returns 
+   */
   deleteUser(id: number) {
     return new Promise((resolve, reject) => {
       this.service.delete(ApiUrl.User, id).subscribe(res => {
@@ -74,7 +88,10 @@ export class AppComponent implements OnInit {
     this.OpenDialog('1000ms', '600ms', id)
   }
 
-
+  /**
+   * delete a user
+   * @param id given user id 
+   */
   delete(id: number) {
     debugger;
     alertify.set('notifier', 'position', 'top-right');
@@ -88,20 +105,26 @@ export class AppComponent implements OnInit {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         const isDeleted = await this.deleteUser(id);
-        if(isDeleted){
-        this.users = await this.getUsers() as User[];
-        this.dataSource = new MatTableDataSource<User>(this.users)
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-        alertify.success("The user has been removed successfully");
-      } else if (result.isDenied) {
-        alertify.success("The user has been failed to remove");
+        if (isDeleted) {
+          this.users = await this.getUsers() as User[];
+          this.dataSource = new MatTableDataSource<User>(this.users)
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+          alertify.success("The user has been removed successfully");
+        } else if (result.isDenied) {
+          alertify.success("The user has been failed to remove");
+        }
       }
-    }
     })
 
   }
 
+  /**
+   * open popup
+   * @param enteranimation 
+   * @param exitanimation 
+   * @param id id of select user
+   */
   OpenDialog(enteranimation: any, exitanimation: any, id: any) {
 
     const dialogModal = this.dialog.open(ModalpopupComponent, {

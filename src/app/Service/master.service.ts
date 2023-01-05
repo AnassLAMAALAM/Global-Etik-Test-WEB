@@ -7,6 +7,9 @@ import { Observable, Subject, tap } from 'rxjs';
 })
 export class AppSettings {
 
+  /**
+   * url of API
+   */
   public static API_URL = 'https://localhost:44382/';
 
 
@@ -14,9 +17,6 @@ export class AppSettings {
   get RequiredRefresh() {
     return this._refreshrequired;
   }
-
-
-
 
   constructor(
     private httpClient: HttpClient

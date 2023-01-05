@@ -16,15 +16,21 @@ import Swal from 'sweetalert2'
 })
 export class ModalpopupComponent implements OnInit {
 
-  constructor(private service: AppSettings, public dialogRef: MatDialogRef<ModalpopupComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
+
+  //#region 
   statusEnum: typeof StatusEnum = StatusEnum;
   isModif = false;
   desdata: any;
   respdata: any;
   oldUser: any;
+  form: any;
+  //#endregion
+
+  constructor(private service: AppSettings, public dialogRef: MatDialogRef<ModalpopupComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
+    this.createForm();
     if (this.data.id) {
       this.isModif = true;
       this.setData(this.data.id);
@@ -33,8 +39,26 @@ export class ModalpopupComponent implements OnInit {
     }
   }
 
+  /**
+   * Create form
+   */
+  createForm() {
+    this.form = new FormGroup({
+      name: new FormControl("", Validators.required),
+      email: new FormControl("", [Validators.required, Validators.required,
+      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]),
+      birthday: new FormControl("", Validators.required),
+      password: new FormControl("", Validators.required),
+      status: new FormControl(StatusEnum.Enabled),
+    });
+  }
 
 
+
+  /**
+   * get a user with give id and set the gitten object in form
+   * @param id 
+   */
   setData(id: any) {
     this.service.getById(`${ApiUrl.User}`, id).subscribe((item: any) => {
       this.oldUser = item;
@@ -48,15 +72,10 @@ export class ModalpopupComponent implements OnInit {
     });
   }
 
-  form = new FormGroup({
-    name: new FormControl("", Validators.required),
-    email: new FormControl("", [Validators.required, Validators.required, 
-      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]),
-    birthday: new FormControl("", Validators.required),
-    password: new FormControl("", Validators.required),
-    status: new FormControl(StatusEnum.Enabled),
-  });
 
+  /**
+   * submit to (Add, Update)
+   */
   async submit() {
     if (this.form.valid) {
       let resultCommand = null;
@@ -83,10 +102,17 @@ export class ModalpopupComponent implements OnInit {
     }
   }
 
+  /**
+   * cancel component
+   */
   close() {
     this.dialogRef.close();
   }
 
+  /**
+   * create user funtion
+   * @returns 
+   */
   createUser() {
     return new Promise((resolve, reject) => {
       this.service.create(`${ApiUrl.User}/${ApiAction.Create}`, this.form.value).subscribe((res: any) => {
@@ -98,17 +124,18 @@ export class ModalpopupComponent implements OnInit {
   }
 
 
-  // Update User
-  updateUser(dataToUpate: any) {
+  /**
+   * update user funtion
+   * @param user the given user to upate
+   * @returns 
+   */
+  updateUser(user: any) {
     return new Promise((resolve, reject) => {
-      this.service.update(`${ApiUrl.User}/${ApiAction.Update}`, dataToUpate).subscribe((res: any) => {
+      this.service.update(`${ApiUrl.User}/${ApiAction.Update}`, user).subscribe((res: any) => {
         resolve(true);
       }, (err: any) => {
         reject(err)
       });
     });
   }
-
-  // Delete User
-
 }
